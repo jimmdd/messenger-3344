@@ -5,8 +5,6 @@ import moment from "moment";
 
 const Messages = (props) => {
   const { messages, otherUser, userId } = props;
-  // sort message in created time asc order to display messages correctly
-  messages.sort((a, b) => moment(a.createdAt).isBefore(b.createdAt) ? -1 : 1)
 
   return (
     <Box>

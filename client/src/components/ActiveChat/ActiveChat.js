@@ -52,13 +52,11 @@ const ActiveChat = (props) => {
 };
 
 const mapStateToProps = (state) => {
-  // create new object to ensure shallow comparisons sees the object change
-  const newConversations = state.conversations && state.conversations.find(
-    (conversation) => conversation.otherUser.username === state.activeConversation
-  )
   return {
     user: state.user,
-    conversation: { ...newConversations }
+    conversation: state.conversations && state.conversations.find(
+      (conversation) => conversation.otherUser.username === state.activeConversation
+    )
   };
 };
 

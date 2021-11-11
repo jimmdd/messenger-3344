@@ -104,7 +104,7 @@ const readMessage = (data) => {
 // message format to send to be updated: {conversationId, senderId, status}
 export const updateMessagesStatus = (body) => async (dispatch) => {
   try {
-    await axios.put("/api/messages", body)
+    await axios.patch("/api/messages", body)
 
     const { conversationId, senderId, status } = body
     dispatch(setMessageStatus(conversationId, senderId, status))

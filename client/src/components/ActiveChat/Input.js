@@ -3,6 +3,7 @@ import { FormControl, FilledInput } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import { postMessage } from "../../store/utils/thunkCreators";
+import { updateMessagesStatus } from "../../store/utils/thunkCreators";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -20,7 +21,14 @@ const useStyles = makeStyles(() => ({
 const Input = (props) => {
   const classes = useStyles();
   const [text, setText] = useState("");
-  const { postMessage, otherUser, conversationId, user } = props;
+  const {
+    postMessage,
+    updateMessagesStatus,
+    unreadMessagesCount,
+    otherUser,
+    conversationId,
+    user
+  } = props;
 
   const handleChange = (event) => {
     setText(event.target.value);
@@ -33,11 +41,24 @@ const Input = (props) => {
       text: event.target.text.value,
       recipientId: otherUser.id,
       conversationId,
-      sender: conversationId ? null : user
+      sender: conversationId ? null : user,
+      status: 'SENT'
     };
     await postMessage(reqBody);
     setText("");
   };
+
+  // update messages read status onFocus event
+  const handleUpdate = async () => {
+    if (unreadMessagesCount > 0) {
+      const reqBody = {
+        conversationId,
+        senderId: otherUser.id,
+        status: 'READ'
+      };
+      await updateMessagesStatus(reqBody);
+    }
+  }
 
   return (
     <form className={classes.root} onSubmit={handleSubmit}>
@@ -49,6 +70,7 @@ const Input = (props) => {
           value={text}
           name="text"
           onChange={handleChange}
+          onFocus={handleUpdate}
         />
       </FormControl>
     </form>
@@ -60,6 +82,9 @@ const mapDispatchToProps = (dispatch) => {
     postMessage: (message) => {
       dispatch(postMessage(message));
     },
+    updateMessagesStatus: (payload) => {
+      dispatch(updateMessagesStatus(payload))
+    }
   };
 };
 

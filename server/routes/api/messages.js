@@ -53,6 +53,15 @@ router.patch("/", async (req, res, next) => {
     }
 
     const { conversationId, senderId, status = 'READ' } = req.body;
+    // find if user is in the conversation and stop update if not
+    const conversation = await Conversation.findConversation(
+      senderId,
+      req.user.id
+    );
+    if (!conversation) {
+      return res.sendStatus(403)
+    }
+
     // if conversationId exists, then update all messages with this senderID to 'READ'
     if (conversationId && senderId) {
       const message = await Message.update({ status }, {

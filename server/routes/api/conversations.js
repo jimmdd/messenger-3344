@@ -71,16 +71,36 @@ router.get("/", async (req, res, next) => {
       convoJSON.latestMessageText = convoJSON.messages[0].text;
 
       // set properties for unread message notification count 
-      convoJSON.unreadMessagesCount = convoJSON.messages.filter(
-        message => message.senderId === convoJSON.otherUser.id
-          && message.status !== 'READ').length
+      convoJSON.unreadMessagesCount = await Message.count({
+        where: {
+          senderId: {
+            [Op.eq]: convoJSON.otherUser.id,
+          },
+          conversationId: {
+            [Op.eq]: convo.id
+          },
+          status: {
+            [Op.ne]: 'READ'
+          }
+        }
+      });
 
-      const readMessages = convoJSON.messages.filter(message =>
-        message.senderId !== convoJSON.otherUser.id && message.status === 'READ'
-      )
-      // set properties for last read message to display read status
-      convoJSON.lastReadMessageId = readMessages && readMessages.length > 0 ? readMessages[readMessages.length - 1].id : null
-
+      // get and set last read message id
+      const lastReadMessage = await Message.findOne({
+        order: [['id', 'DESC']],
+        where: {
+          senderId: {
+            [Op.ne]: convoJSON.otherUser.id,
+          },
+          conversationId: {
+            [Op.eq]: convo.id
+          },
+          status: {
+            [Op.eq]: 'READ'
+          }
+        }
+      })
+      convoJSON.lastReadMessageId = lastReadMessage && lastReadMessage.id
       conversations[i] = convoJSON;
     }
 

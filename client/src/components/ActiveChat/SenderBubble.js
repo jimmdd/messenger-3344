@@ -42,9 +42,8 @@ const SenderBubble = (props) => {
         <Typography className={classes.text}>{text}</Typography>
       </Box>
       {
-        showRead ?
-          <Avatar alt="Read" src={otherUser.photoUrl} className={classes.readAvatar} />
-          : null
+        showRead &&
+        <Avatar alt="Read" src={otherUser.photoUrl} className={classes.readAvatar} />
       }
     </Box>
   );

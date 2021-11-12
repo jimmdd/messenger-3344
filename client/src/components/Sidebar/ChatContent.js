@@ -41,9 +41,8 @@ const ChatContent = (props) => {
       </Box>
       <Box>
         {
-          unreadMessagesCount > 0 ?
-            <Chip className={classes.unreadMessageChip} color="primary" size="small" label={unreadMessagesCount} />
-            : null
+          unreadMessagesCount > 0 &&
+          <Chip className={classes.unreadMessageChip} color="primary" size="small" label={unreadMessagesCount} />
         }
       </Box>
     </Box>

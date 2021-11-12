@@ -13,6 +13,7 @@ const Message = db.define("message", {
   status: {
     type: Sequelize.ENUM('READ', 'SENT'),
     allowNull: false,
+    defaultValue: "SENT"
   }
 });
 

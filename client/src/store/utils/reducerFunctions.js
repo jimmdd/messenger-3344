@@ -6,8 +6,10 @@ export const addMessageToStore = (state, payload) => {
       id: message.conversationId,
       otherUser: sender,
       messages: [message],
+      status: 'SENT',
     };
     newConvo.latestMessageText = message.text;
+    newConvo.unreadMessagesCount = 1
     return [newConvo, ...state];
   }
 
@@ -15,12 +17,41 @@ export const addMessageToStore = (state, payload) => {
     if (convo.id === message.conversationId) {
       convo.messages.push(message);
       convo.latestMessageText = message.text;
+      if (convo.otherUser.id === message.senderId) {
+        convo.unreadMessagesCount = convo.unreadMessagesCount ? convo.unreadMessagesCount + 1 : 1
+      }
       return { ...convo };
     } else {
       return convo;
     }
   });
 };
+
+export const updateMessagesStatusToStore = (state, payload) => {
+  const { conversationId, senderId, status } = payload
+  return state.map((convo) => {
+    if (convo.id === conversationId) {
+      let lastReadId = convo.lastReadMessageId
+      convo.messages.map(message => {
+        if (message.senderId === senderId) {
+          message.status = status
+        }
+        // update the last read index for current user
+        if (convo.otherUser.id !== senderId && message.senderId === senderId) {
+          lastReadId = message.id
+        }
+        return message
+      })
+      // reset the unread message count after update status
+      if (convo.otherUser.id === senderId) {
+        convo.unreadMessagesCount = 0
+      }
+      convo.lastReadMessageId = lastReadId
+      return { ...convo }
+    }
+    return convo
+  })
+}
 
 export const addOnlineUserToStore = (state, id) => {
   return state.map((convo) => {
